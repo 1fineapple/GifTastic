@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy API</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+</head>
+
+
+<!-- Buttons and the ability to push Gif Images when a button is clicked -->
+
+<body>
+
+    <form>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Giphy Generator!</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="textAdd" placeholder="Enter Giphy">
+          <small id="emailHelp" class="form-text text-muted"></small>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+
+
+  <div id="buttons"></div>
+  <div id="gifImages"></div>
+  <div id= "buttonsContainer"></div>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+
+  
+  // Array of buttons for the gifs
+
+    var topics = ["palimino", "bay", "dun", "belgian", "pinto", "chestnut", "quarter", "arabian"]
+
+    // A loop is created to go through the array and push the unique buttons to the page 
+    // (should we be assigning the value of the button here?)
+  
+    function setButtons(){
+      for (var i=0; i < topics.length; i++){
+    var topic = topics[i] + "horse";
+    var horseButtons = $("<button>");
+    
+    horseButtons.html(topic);
+    horseButtons.val(topic); 
+
+    $("#buttonsContainer").append(horseButtons);
+
+   }
+    }
+
+    setButtons();
+
+   
+    
+
+    // Example queryURL for Giphy API - how do I find the real one- put the array where trending is?
+    var queryURL = "http://api.giphy.com/v1/gifs/search?q="+topics[0]+"&api_key=a9MlXQAltUHOuV2GopGyz913B3hLRfnC&limit=5";
+
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function(response) {
+      console.log(response);
+    });
+    
+  </script>
+
+</body>
+
+</html>
+
+<!-- make a bootstrap grid -->
+
+<!-- // make the loop a function that you can call so that when you need to create a new button "new gif" it is included in the loop.  -->
+     
+    
