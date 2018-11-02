@@ -10,28 +10,29 @@
 </head>
 
 
-<!-- Buttons and the ability to push Gif Images when a button is clicked -->
+
 
 <body>
 
     <form>
         <div class="form-group">
           <div class=row>
-              <!-- <div id="buttons"></div> -->
 
               <div ></div>
               <div id= "buttonsContainer">
+                <!-- New Buttons will get dumped here -->
+                  
         
               </div>
           </div>
 
         <div class = row>
+          <!-- Images will get dumped here -->
           <div class= col-md-8 id="gifImages">
           <label for="exampleInputEmail1">Giphy Generator!</label>
           </div>
           <div class= col-md-4>
           <input type="text" class="form-control" id="gifGenerator" aria-describedby="textAdd" placeholder="Enter Giphy">
-          <small id="emailHelp" class="form-text text-muted"></small>
 
           <button id="findGif" type="submit" class="btn btn-primary">Submit</button>
         </div>
@@ -46,49 +47,170 @@
   <script type="text/javascript">
 
   
-  // Array of buttons for the gifs
-
-    var topics = ["funny", "angry", "sad", "happy", "smiling", "adventurous", "moody", "freak"]
-
-    // A loop is created to go through the array and push the unique buttons to the page 
-    // (should we be assigning the value of the button here?)
+    // Array of buttons for the gifs
+    var topics = ["bird", "dog", "cat", "horse", "mouse", "moose", "lion", "tiger"]
   
-    function setButtons(){
-      for (var i=0; i < topics.length; i++){
-    var topic = topics[i] + "animal";
-    var emoButtons = $("<button>");
-    
-    emoButtons.html(topic);
-    emoButtons.val(topic); 
+    // listen on clicks on the findGif form submit button
+    $("#findGif").on("click",function(event){
 
-    $("#buttonsContainer").append(emoButtons);
+    // prevent submitting the form
+    event.preventDefault();
 
-   }
-    }
+    // read and process input value from form input element
+    var inputHTMLElement = $("#gifGenerator");
+    var inputValue = inputHTMLElement.val();
+    var inputValueTrimmed = inputValue.trim();
+
+    // add input value from the form input element to our topics array
+    topics.push(inputValueTrimmed);
+
+
 
     setButtons();
+  });
 
+  
+  
+  // sets the buttons into the buttons container from the array
+  function setButtons(){
+  
+  $("#buttonsContainer").empty();
+
+    var topic;
+    var emoButtons;
+
+    // A loop is created to go through the array and push the unique buttons to the page 
+    for (var i=0; i < topics.length; i++) {
+
+
+      // put the word funny in front of my topic
+      topic = "funny " + topics[i];
+
+      // CREATES a NEW HTML button element
+
+      // CREATE a button for topic and assign the button to a emoButtons
+      emoButtons = $("<button>");
+
+      // take the value of the topic from the html and assign it to emoButtons
+      emoButtons.text(topic);
+      emoButtons.val(topic); 
+
+        // ADD buttons-view class to emoButtons - the variable for the button just created 
+      emoButtons.addClass("buttons-view");
+
+        // append the buttons we created within the buttons container
+      $("#buttonsContainer").append(emoButtons);
+
+      
+    }
+  }
+    // We have to call the function after we have created it to activate
+    setButtons();
 
    
-   $("<button>").on("click", function() {
 
-   
-    // Example queryURL for Giphy API - how do I find the real one- put the array where trending is?
-    var queryURL = "http://api.giphy.com/v1/gifs/search?q="+"dogs"+"&api_key=a9MlXQAltUHOuV2GopGyz913B3hLRfnC&limit=10";
+    // A button is clicked and the associated data is pulled from Giphy
 
+   $(".buttons-view").on("click", function(event) {
+
+    event.preventDefault();
+
+    // Create a variable to hold the different topics in the array represented by "this"
+
+     var gif = $(this).val().trim();
+
+    
+    // queryURL for Giphy API with API Key and the varible holding the topics
+    var queryURL = "http://api.giphy.com/v1/gifs/search?q="+ gif +"&api_key=a9MlXQAltUHOuV2GopGyz913B3hLRfnC&limit=10";
+    
+    // the AJAX call "getting"
     $.ajax({
       url: queryURL,
       method: "GET"
     })
-    
-    .then(function(response) {
-      console.log(response);
+      
+      .then(function(response) {
+        console.log(response);
+
+        // storing the data from the AJAX request in the results variable
+        var results = response.data;
+
+        // Looping through each result item
+        for (var i = 0; i < results.length; i++) {
+
+        // Creating and storing a div tag
+        var animalDiv = $("<div>");
+
+        // Storing the result item's rating
+        var rating = results[i].rating;
+
+        // Creating a paragraph tag with the result item's rating
+        var p = $("<p>").text("Rating: " + rating);
+
+        // Creating and storing an image tag
+        var animalImage = $("<img>");
+
+        // Setting the src attribute of the image to a property pulled off the result item
+        animalImage.attr("src", results[i].images.fixed_height.url);
+
+        // Appending the paragraph and image tag to the animalDiv
+        animalDiv.append(animalImage);
+        animalDiv.append(p);
+
+        // Prependng the animalDiv to the HTML page in the "#gifs-appear-here" div
+        $("#gifImages").prepend(animalDiv);
+          
+          }
+
+
+
+        // Here we are looking through for the gif files to animate on click and change the state of the image 
+        for (var i = 0; i < response.data.length; i++) {      
+            var respData = response.data[i];
+            var animatedImg = respData.images.fixed_height.url;
+            var stillImg = respData.images.fixed_height_small_still.url;
+            var images = response.data[i].images;
+
+          // don't know how to link the gifs type here!
+            var animatedImg = "data-animate";
+            var stillImg = "data-still";
+            var images  = "src";
+            
+
+
+                $(".gif").on("click", function() {
+
+                    console.log("text");
+                    // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+                    var state = $(this).attr("data-state");
+                    // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+                    // Then, set the image's data-state to animate
+                    // Else set src to the data-still value
+                    if (state === "still") {
+                      $(this).attr("src", $(this).attr("data-animate"));
+                      $(this).attr("data-state", "animate");
+                    } 
+                    else {
+                      $(this).attr("src", $(this).attr("data-still"));
+                      $(this).attr("data-state", "still");
+                      }
+                  });
+
+          }
+
+        });
 
     });
 
-    $("#gifImages").prepend(response);
+     
 
-  });
+
+
+  
+
+
+
+
 
     
   </script>
@@ -97,9 +219,6 @@
 
 </html>
 
-<!-- make a bootstrap grid -->
-
-<!-- // make the loop a function that you can call so that when you need to create a new button "new gif" it is included in the loop.  -->
 
 
      
